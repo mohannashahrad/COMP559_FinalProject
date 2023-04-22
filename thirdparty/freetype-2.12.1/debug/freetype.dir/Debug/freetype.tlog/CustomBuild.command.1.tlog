@@ -1,0 +1,10 @@
+^C:\USERS\PAULK\GITHUB\COMP599CPP\COMP559A1SOL\3RDPARTY\FREETYPE-2.12.1\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/paulk/GitHub/comp599cpp/COMP559A1 -BC:/Users/paulk/GitHub/comp599cpp/COMP559A1/build --check-stamp-file C:/Users/paulk/GitHub/comp599cpp/COMP559A1Sol/3rdparty/freetype-2.12.1/debug/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
