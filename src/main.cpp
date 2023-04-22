@@ -61,8 +61,6 @@ bool gridShown = true;
 string scene = "";
 int testSceneID = 0;
 int showKeyBindings = 0;
-double avgTime = 0.0; 
-double timeNum = 0.0;
 
 // for openGL
 GLFWwindow* window; // Main application window
@@ -81,7 +79,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 	if ((action != GLFW_PRESS) && (action != GLFW_REPEAT)) return;
 	if (key == GLFW_KEY_ESCAPE) {
-		cout << avgTime/timeNum << endl;
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	} else if (key == GLFW_KEY_SPACE) {
 		// Space for running the simulator
@@ -202,15 +199,7 @@ void display() {
 	struct timeval begin, end;
 	if (run) {
 		for (int i = 0; i < substeps; i++) {
-			gettimeofday(&begin, 0);
 			unified_sim.advanceTime(stepsize / substeps);
-			gettimeofday(&end, 0);
-			long seconds = end.tv_sec - begin.tv_sec;
-			long microseconds = end.tv_usec - begin.tv_usec;
-			double elapsed = seconds + microseconds*1e-6;
-			avgTime += elapsed;
-			timeNum += 1.0;
-			//cout << elapsed << endl;
 		}
 		if ( recordFrames ) recordFrame = true;
 	}

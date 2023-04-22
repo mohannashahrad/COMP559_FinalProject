@@ -30,101 +30,113 @@ public:
 
     // Based on Algorithm 1 of Muller's Position Based Fluids
     void project(std::vector<Particle*> *particles, int *sim_n) {
-
-        // Compute Lambda Values (Equation 11 of Mullers's Position-based Fluids)
         lambda_values.clear();
-        for (int k = 0; k < particle_indices.size(); k++) {
-            neighbors[k].clear();
-            int i = particle_indices[k];
+        
+        // Compute Lambda Values (Equation 11 of Mullers's Position-based Fluids)
+        for (int i = 0; i < particle_indices.size(); i++) {
+            
+            neighbors[i].clear();
 
-            Particle *p_i = particles->at(i);
-            double pi = 0., denom = 0.;
+            // Index of that particle
+            int j = particle_indices[i];
+            Particle *p_j = particles->at(j);
 
-            // Find neighbors
-            for (int j = 0; j < particles->size(); j++) {
+            // density estimate of p_j
+            double dens_j = 0.0;
+            double denominator = 0.0;
 
-                // Check if the next particle is actually this particle
-                if (j != i) {
-                    Particle *p_j = particles->at(j);
+            // Finding neighbors
+            for (int k = 0; k < particles->size(); k++) {
 
-                    // Nothing to do for fixed particles
-                    if (p_j->i_mass == 0) continue;
+                if (k != j) {
+                    Particle *p_k = particles->at(k);
 
-                    glm::dvec2 r = p_i->ep - p_j->ep;
+                    // Skip fixed particles
+                    if (p_k->i_mass == 0) continue;
 
-                    double rlen2 = glm::dot(r, r);
+                    glm::dvec2 r_vect = p_j->ep - p_k->ep;
+                    double r = glm::dot(r_vect, r_vect);    // || r_vect || = r
 
-                    if (rlen2 < H2) {
-                        // Found a neighbor! Remember it and add to pi and the gamma denominator
-                        neighbors[k].push_back(j);
-                        double incr = poly6(rlen2) / p_j->i_mass;
-                        if (p_j->ph == RIGID) {
-                            incr *= S_SOLID_COUPLING;
+                    if (r < H2) {  // This is a neighbor
+                        neighbors[i].push_back(k);
+                        double poly6_term = poly6(r);
+
+                        if (p_k->ph == RIGID) {
+                            dens_j += ((poly6_term / p_k->i_mass) * S_SOLID_COUPLING);
+                        } else {
+                            dens_j += (poly6_term / p_k->i_mass);
                         }
-                        pi += incr;
 
-                        glm::dvec2 gr = calculateGrad(particles, k, j);
-                        denom += glm::dot(gr, gr);
+                        glm::dvec2 gradient_vect = calculateGrad(particles, i, k);
+                        denominator += glm::dot(gradient_vect, gradient_vect);
                     }
 
-                // If it is, cut to the chase
+                // If next particle is the particle with index i
                 } else {
-                    neighbors[k].push_back(j);
-                    pi += poly6(0) / p_i->i_mass;
+                    neighbors[i].push_back(k);
+                    dens_j += poly6(0) / p_j->i_mass;
                 }
             }
 
-            glm::dvec2 gr = calculateGrad(particles, k, i);
-            denom += glm::dot(gr, gr);
-
-            double p_rat = (pi/rest_density);
+            glm::dvec2 gradient_vect = calculateGrad(particles, i, j);
+            denominator += glm::dot(gradient_vect, gradient_vect);
+            double dens_ratio = (dens_j/rest_density);
 
             // Enforcing of f_drag [Equation 29 of Paper]
+            // Using k of -2
             if(open) {
-                //p_i->f += p_i->v * (1.-p_rat) * -50.0;
-                p_i->addForce(p_i->v * (1.0-p_rat) * -2.0);
+                p_j->addForce(p_j->v * (1.0-dens_ratio) * -2.0);
             }
 
             double relaxation = 0.05;   // For gamma correction
-            double lambda = -(p_rat - 1.) / (denom + relaxation);
-            lambda_values[i] = lambda;
+            lambda_values[j] = (-(dens_ratio - 1.) / (denominator + relaxation));
         }
 
-        // Compute actual delta_values
-        for (int k = 0; k < particle_indices.size(); k++) {
+        // Compute Delta Values (Equation 12 of Mullers's Position-based Fluids)
+        // NOTE: spikyGradient kernel is used here instead of poly6 as Position-based Fluids
+        for (int i = 0; i < particle_indices.size(); i++) {
+            // Value of delta would be summed in the inner loop and updated in the outer loop 
             glm::dvec2 delta = glm::dvec2();
-            glm::dvec2 f_vort = glm::dvec2();
-            int i = particle_indices[k];
-            Particle *p_i = particles->at(i);
+            glm::dvec2 f_vortocity = glm::dvec2();
 
-            for (int x = 0; x < neighbors[k].size(); x++) {
-                int j = neighbors[k][x];
-                if (i == j) continue;
+            int j = particle_indices[i];
+            Particle *p_j = particles->at(j);
 
-                Particle *p_j = particles->at(j);
-                glm::dvec2 r = p_i->ep - p_j->ep;
+            // Iterating through all neighbors of p_j
+            for (int k = 0; k < neighbors[i].size(); k++) {
 
-                double rlen = glm::length(r);
-                glm::dvec2 sg = spikyGradient(r, rlen);
+                int n = neighbors[i][k];
 
-                double lambdaCorr = -K_TERM * pow((poly6(rlen * rlen) / poly6(DELTA_Q_TERM_GAS * DELTA_Q_TERM_GAS * H * H)), N_TERM);
-                delta += (lambda_values[i] + lambda_values[j] + lambdaCorr) * sg;
+                if (j != n) {
+                    // p_n is the neighbor of p_j
+                    Particle *p_n = particles->at(n);
 
+                    // Implementing Equation (13-14) of Muller's PBF
+                    glm::dvec2 r_vect = p_j->ep - p_n->ep;
+                    double r = glm::length(r_vect);
 
-                //  vorticity
-                glm::dvec2 gradient = spikyGradient(r, glm::dot(r,r));
-                glm::dvec2 w = gradient * p_j->v;
-                glm::dvec3 cross = glm::cross(glm::dvec3(0,0,glm::length(w)), glm::dvec3(r.x, r.y, 0));
-                f_vort += glm::dvec2(cross.x, cross.y) * poly6(glm::dot(r,r));
+                    glm::dvec2 spiky_grad_term = spikyGradient(r_vect, r);
+
+                    double sCorr = -K_TERM * pow((poly6(r * r) / poly6(DELTA_Q_TERM_GAS * DELTA_Q_TERM_GAS * H * H)), N_TERM);
+                    delta += (lambda_values[j] + lambda_values[n] + sCorr) * spiky_grad_term;
+
+                    // Applying Vortocity
+                    // Look at section 7.2.3 of the unified physics paper
+                    glm::dvec2 w = spikyGradient(r_vect, glm::dot(r_vect,r_vect)) * p_n->v;
+                    glm::dvec3 crossProduct = glm::cross(glm::dvec3(0,0,glm::length(w)), glm::dvec3(r_vect.x, r_vect.y, 0));
+                    
+                    f_vortocity += glm::dvec2(crossProduct.x, crossProduct.y) * poly6(glm::dot(r_vect,r_vect));
+                }
             }
-            delta_values[k] = (delta / rest_density);
-            p_i->f += f_vort;
+
+            delta_values[i] = (delta / rest_density);
+            p_j->f += f_vortocity;
         }
 
-        for (int k = 0; k < particle_indices.size(); k++) {
-            int i = particle_indices[k];
-            Particle *p_i = particles->at(i);
-            p_i->ep += delta_values[k] / ((double) neighbors[k].size() + sim_n[i]);
+        for (int i = 0; i < particle_indices.size(); i++) {
+            int j = particle_indices[i];
+            Particle *p_j = particles->at(j);
+            p_j->ep += delta_values[i] / ((double) neighbors[i].size() + sim_n[j]);
         }
     }
     
