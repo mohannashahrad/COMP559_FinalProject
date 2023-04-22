@@ -28,7 +28,6 @@ public:
         delete[] neighbors;
     }
 
-    // TODO: Re-write this project function
     // Based on Algorithm 1 of Muller's Position Based Fluids
     void project(std::vector<Particle*> *particles, int *sim_n) {
 
@@ -144,7 +143,6 @@ public:
     }
 
     // For Gradient Calculation spikyGradient is used as explained in Mulller's PBF
-    // DEBUG: Deleted old gead from here
     glm::dvec2 calculateGrad(std::vector<Particle *> *particles, int idx1, int idx2){
 
         Particle *p1 = particles->at(particle_indices[idx1]);

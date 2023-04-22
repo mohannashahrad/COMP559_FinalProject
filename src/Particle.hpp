@@ -33,12 +33,9 @@ enum Phase {
 };
 
 // Groups of constraints
-// TODO: What for shape constraints?
-// NOTE: I did not include any stabilization constraints in this project and instead used an iterative approach.
 enum ConstraintGroup {
     CONTACT,
     GENERAL,
-    SHAPE,
     NUM_CONSTRAINT_GROUPS
 };
 
@@ -57,13 +54,12 @@ public:
 
     glm::vec3 color{ 0.0f, 0.95f, 0.0f };
 
-    // TODO: Should be removed later
     double mass = 1;
 
     double i_mass;  // Inverse Mass (M^-1)
     double t_mass;  // Temporary Mass
 
-    // TODO: What to do with these parameters?
+    // Used in boundary constraitns
     double sFriction, kFriction;     // Friction coefficients (Static and Kinetic frictions)
     Phase ph;       // Phase of the particle (Look at the paper for more definition)  
 

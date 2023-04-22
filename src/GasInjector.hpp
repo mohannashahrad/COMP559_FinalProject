@@ -1,8 +1,3 @@
-#define H 2.
-#define H2 4.
-#define H6 64.
-#define H9 512.
-
 #include <stdlib.h>
 #include <iostream>
 

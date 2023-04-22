@@ -56,14 +56,11 @@ public:
     void gasOpen();
     void gasClosed();
     void twoFluid();
-
     void advanceTime(double elapsed);
     void display();
     void resize(int width, int height);
     void showGrid();
     void unshowGrid();
-
-    // Debug information and flags
     int getNumParticles();
     glm::dvec2 gravity;
     bool isGridShown;
@@ -73,7 +70,6 @@ private:
     // Reset the simulation
     void clear();
 
-    // Functions for different types of particles
     GasConstraint *createGasConstraint(std::vector<Particle*> *particles, double density, Boundary boundary);
     FluidConstraint *createFluidConstraint(std::vector<Particle *> *in_particles, double density);
     void addGasInjector(glm::dvec2 posn, GasConstraint *gs, double particlesPerSec, bool isOpen);
@@ -87,13 +83,13 @@ private:
 
     // Counts for iterative particle solver [parameter n in Alg 1 of the paper]
     int *sim_n;
+    glm::ivec2 dimensions;
+    glm::dvec2 xBnd, yBnd;
 
     // Storage of global particles, rigid bodies, and general constraints
     std::vector<Particle*> particles;
     std::vector<GasInjector*> gasInjectors;
     std::map<ConstraintGroup, std::vector<Constraint *>> globalConstraints;
 
-    // Drawing and boundary information
-    glm::ivec2 dimensions;
-    glm::dvec2 xBnd, yBnd;
+    
 };

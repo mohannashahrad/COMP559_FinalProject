@@ -13,6 +13,7 @@ public:
     }
     virtual ~BoundaryConstraint() {}
 
+    // Look at section 6.1 of the unified particle system paper for this
     void project(std::vector<Particle *> *particles, int *sim_n) {
         
         // Nothing to do if the particle is isStatic

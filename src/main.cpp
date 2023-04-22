@@ -77,7 +77,6 @@ static void error_callback(int error, const char* description) {
 	cerr << description << endl;
 }
 // Keyboard control pane
-// TODO: Add some keys to control the parameters of the simulator
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
 	if ((action != GLFW_PRESS) && (action != GLFW_REPEAT)) return;
@@ -112,14 +111,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	} else if (key == GLFW_KEY_R && (mods & GLFW_MOD_SHIFT)) {
 		// R for recording
 		recordFrames = !recordFrames;
-	} else if (key == GLFW_KEY_D) {
-		showKeyBindings = (showKeyBindings+1)%3;
-	} else if (key == GLFW_KEY_T) {
-		// t-T for toggle gravity
-		// TOdo : Add toggle gravity here
-		// particleSystem.useGravity = !particleSystem.useGravity;
-	} 
-	
+	}
 	// For managing substeps
 	if (key == GLFW_KEY_UP) {
 		substeps++;
@@ -187,14 +179,6 @@ static void init() {
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POINT_SMOOTH);
 	glDisable(GL_DEPTH_TEST);
-
-	if (scene.empty()) {
-		// The opening scene!
-		// somthing here
-	} else {
-		// particleSystem.name = scene;
-		// TODO: Add support for showing scene here
-	}
 	
 	// If there were any OpenGL errors, this will print something.
 	// You can intersperse this line in your code to find the exact location
@@ -243,8 +227,6 @@ static void render() {
 	unified_sim.resize(width, height);
 
 	// Clear framebuffer.
-	//TODO: Set something fancy
-	//glClearColor(0.2f, 0.2f, 0.1f, 0.0f);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -262,11 +244,11 @@ static void render() {
 	ss << "\n";
 	if (showKeyBindings == 0) {
 		ss << "Number of Particles: " << unified_sim.getNumParticles() << "\n";
+		ss << "g Value = " << unified_sim.gravity[1] << "\n";
 		ss << "[f,F] Two-phase Fluid \n";
 		ss << "[o,O] Gas Open Boundary \n";
 		ss << "[c,C] Gas Closed Boundary \n";
 		ss << "[z,Z] Draw Grid Lines \n";
-		ss << "g Value = " << unified_sim.gravity[1] << "\n";
 		ss << "[space] : start stop" << "\n";
 	} 
 

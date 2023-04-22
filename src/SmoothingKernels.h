@@ -9,7 +9,6 @@
 #ifndef SMOOTHINGKERNELS_H
 #define SMOOTHINGKERNELS_H
 
-// TODO: Play with values of H
 #define H 2.
 #define H2 4. 
 #define H6 64.

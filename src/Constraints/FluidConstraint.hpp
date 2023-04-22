@@ -1,6 +1,6 @@
 // Fluid-solid coupling constant
 // Check equation (27) of Muller's "Unified Particle Physics for Real-Time Applications" paper
-#define S_SOLID 0.0
+#define S_SOLID_COUPLING 0.0
 
 #include "../Particle.hpp"
 
@@ -58,7 +58,7 @@ public:
                         double poly6_term = poly6(r);
 
                         if (p_k->ph == RIGID) {
-                            dens_j += ((poly6_term / p_k->i_mass) * S_SOLID);
+                            dens_j += ((poly6_term / p_k->i_mass) * S_SOLID_COUPLING);
                         } else {
                             dens_j += (poly6_term / p_k->i_mass);
                         }
@@ -148,7 +148,7 @@ public:
 
             // Call spikyGradient
             if (p2->ph == RIGID) {
-                res += S_SOLID * spikyGradient(r_vect, r);
+                res += S_SOLID_COUPLING * spikyGradient(r_vect, r);
             } else {
                 res += spikyGradient(r_vect, r);
             }

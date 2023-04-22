@@ -13,7 +13,6 @@ UnifiedFramework::~UnifiedFramework() {
     clear();
 }
 
-// TODO: Double check
 void UnifiedFramework::clear() {
 
     // Removing all particles
@@ -175,8 +174,9 @@ void UnifiedFramework::gasClosed() {
     GasConstraint *constraint = createGasConstraint(&particles, 1.5, CLOSED);
 
     // Gas Injector explained in section 7.2.1
-    addGasInjector(glm::dvec2(0,-2), constraint, 15, false);
+    addGasInjector(glm::dvec2(0,-2), constraint, 20, false);
 
+    // Free mem
     particles.clear();
 }
 
