@@ -64,8 +64,7 @@ public:
     double t_mass;  // Temporary Mass
 
     // TODO: What to do with these parameters?
-    double sFriction, kFriction, t;     // Friction coefficients (Static and Kinetic frictions)
-    int  body;      // Body of the particle
+    double sFriction, kFriction;     // Friction coefficients (Static and Kinetic frictions)
     Phase ph;       // Phase of the particle (Look at the paper for more definition)  
 
     vec2 p;         // Position
@@ -96,8 +95,6 @@ public:
     Particle( double x, double y, double mass, Phase phase = RIGID): vTemp(0,0), v(0,0), ph(phase) {
         p0 = vec2(x, y);
         v0 = vec2(0,0);
-        t = 4;
-        body = -1;
         sFriction = 0;
         kFriction = 0;
 
@@ -118,8 +115,6 @@ public:
         
         p0 = vec2(x, y);
         v0 = vec2(0,0);
-        t = 4;
-        body = -1;
         sFriction = 0;
         kFriction = 0;
 
@@ -141,8 +136,6 @@ public:
         v0 = vec2(vx, vy);
 
         // init values
-        t = 4;
-        body = -1;
         sFriction = 0;
         kFriction = 0;
 

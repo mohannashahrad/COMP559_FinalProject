@@ -266,38 +266,15 @@ static void render() {
 		ss << "[o,O] Gas Open Boundary \n";
 		ss << "[c,C] Gas Closed Boundary \n";
 		ss << "[z,Z] Draw Grid Lines \n";
-		ss << "[g,G] g = " << unified_sim.gravity[1] << "\n";
-		/*ss << "[t] use gravity = " << particleSystem.useGravity << "\n";
-		ss << "[up,down] substeps = " << substeps << "\n";
-		ss << "[i,I] ccd max iter = " << particleSystem.ccd.maxIterations << "\n";
-		ss << "[p] use repulsion = " << particleSystem.ccd.useRepulsion << "\n";
-		ss << "[m,M] repulsion threshold distance = " << particleSystem.ccd.thresholdDistance << "\n";
-		ss << "[n,N] repulsion stiffness = " << particleSystem.ccd.repulsionStiffness << "\n";
-		ss << "[o,O] restitution = " << particleSystem.ccd.restitutionValue << "\n";
-		ss << "\n";
-		ss << "computeTime = " << particleSystem.computeTime << "\n";
-		ss << "CCD iterations = " << particleSystem.ccd.iterations << "\n";
-		ss << "CCD highest iterations = " << particleSystem.ccd.highestIterations << "\n";
-		ss << "\n";
-		ss << "[R] recording" << (recordFrames?" ON ":" OFF ") << imageRecorder.filename << "\n";
-		ss << "[d] show(hide) other keybindings" << "\n";*/
-	} else if (showKeyBindings == 1) {
+		ss << "g Value = " << unified_sim.gravity[1] << "\n";
 		ss << "[space] : start stop" << "\n";
-		ss << "[s] step" << "\n";
-		ss << "[r] reset" << "\n";
-		ss << "[c] clear" << "\n";
-		ss << "[z] zero velocities" << "\n";
-		ss << "[a] alphabet factory scene" << "\n";
-		ss << "[f,F] Faster(slower) h*=2 substeps*=2" << "\n";
-	}
+	} 
+
 	string text = ss.str();
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f);
 	glm::mat4 modelview = glm::identity<glm::mat4>();
 
-	//string t = "Two-phase liquid with a density ratio of 2:1";
-
 	RenderString(projection, modelview, 990, 50, 0.4, text);
-	//RenderString(projection, modelview, 50, 650, 0.4, t);
 
 	if (recordFrame) {
 		recordFrame = false;
